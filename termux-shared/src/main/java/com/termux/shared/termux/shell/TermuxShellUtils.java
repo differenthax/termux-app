@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.termux.shared.errors.Error;
 import com.termux.shared.file.filesystem.FileTypes;
+import com.termux.shared.termux.TermuxBootstrap;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.logger.Logger;
@@ -28,8 +29,10 @@ public class TermuxShellUtils {
     public static String TERMUX_IS_DEBUGGABLE_BUILD;
     public static String TERMUX_APP_PID;
     public static String TERMUX_APK_RELEASE;
+    public static Boolean TERMUX_APP_AM_SOCKET_SERVER_ENABLED;
 
     public static String TERMUX_API_VERSION_NAME;
+
 
     private static final String LOG_TAG = "TermuxShellUtils";
 
@@ -59,6 +62,12 @@ public class TermuxShellUtils {
             environment.add("TERMUX_APP_PID=" + TERMUX_APP_PID);
         if (TERMUX_APK_RELEASE != null)
             environment.add("TERMUX_APK_RELEASE=" + TERMUX_APK_RELEASE);
+        if (TermuxBootstrap.TERMUX_APP_PACKAGE_MANAGER != null)
+            environment.add("TERMUX_APP_PACKAGE_MANAGER=" + TermuxBootstrap.TERMUX_APP_PACKAGE_MANAGER.getName());
+        if (TermuxBootstrap.TERMUX_APP_PACKAGE_VARIANT != null)
+            environment.add("TERMUX_APP_PACKAGE_VARIANT=" + TermuxBootstrap.TERMUX_APP_PACKAGE_VARIANT.getName());
+        if (TERMUX_APP_AM_SOCKET_SERVER_ENABLED != null)
+            environment.add("TERMUX_APP_AM_SOCKET_SERVER_ENABLED=" + TERMUX_APP_AM_SOCKET_SERVER_ENABLED);
 
         if (TERMUX_API_VERSION_NAME != null)
             environment.add("TERMUX_API_VERSION=" + TERMUX_API_VERSION_NAME);
@@ -86,9 +95,14 @@ public class TermuxShellUtils {
             environment.add("PATH= " + System.getenv("PATH"));
         } else {
             environment.add("LANG=en_US.UTF-8");
-            environment.add("PATH=" + TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH);
             environment.add("PWD=" + workingDirectory);
             environment.add("TMPDIR=" + TermuxConstants.TERMUX_TMP_PREFIX_DIR_PATH);
+            if (TermuxBootstrap.isAppPackageVariantAPTAndroid5()) {
+                environment.add("PATH=" + TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH + ":" + TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH + "/applets");
+                environment.add("LD_LIBRARY_PATH=" + TermuxConstants.TERMUX_LIB_PREFIX_DIR_PATH);
+            } else {
+                environment.add("PATH=" + TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH);
+            }
         }
 
         return environment.toArray(new String[0]);

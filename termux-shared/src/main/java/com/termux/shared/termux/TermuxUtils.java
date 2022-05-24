@@ -397,6 +397,11 @@ public class TermuxUtils {
 
         markdownString.append((AndroidUtils.getAppInfoMarkdownString(context)));
 
+        if (context.getPackageName().equals(TermuxConstants.TERMUX_PACKAGE_NAME)) {
+            AndroidUtils.appendPropertyToMarkdown(markdownString, "TERMUX_APP_PACKAGE_MANAGER", TermuxBootstrap.TERMUX_APP_PACKAGE_MANAGER);
+            AndroidUtils.appendPropertyToMarkdown(markdownString, "TERMUX_APP_PACKAGE_VARIANT", TermuxBootstrap.TERMUX_APP_PACKAGE_VARIANT);
+        }
+
         Error error;
         error = TermuxFileUtils.isTermuxFilesDirectoryAccessible(context, true, true);
         if (error != null) {
@@ -629,6 +634,8 @@ public class TermuxUtils {
                 return TermuxConstants.APK_RELEASE_GITHUB;
             case TermuxConstants.APK_RELEASE_GOOGLE_PLAYSTORE_SIGNING_CERTIFICATE_SHA256_DIGEST:
                 return TermuxConstants.APK_RELEASE_GOOGLE_PLAYSTORE;
+            case TermuxConstants.APK_RELEASE_TERMUX_DEVS_SIGNING_CERTIFICATE_SHA256_DIGEST:
+                return TermuxConstants.APK_RELEASE_TERMUX_DEVS;
             default:
                 return "Unknown";
         }
